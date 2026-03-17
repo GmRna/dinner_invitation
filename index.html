@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinner Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Noto+Serif+KR:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --card-black: #121212;
+            --gold: #D4AF37;
+            --light-gold: #F3E5AB;
+            --muted-gold: #AA8C2C;
+            --text-gray: #B0B0B0;
+            --text-dark-gray: #888888;
+        }
+
+        body {
+            /* 한글은 Noto Serif KR, 영문은 Montserrat가 적용되도록 설정 */
+            font-family: 'Montserrat', 'Noto Serif KR', serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            
+            /* 핀조명 효과 배경 */
+            background-color: #000000;
+            background-image: radial-gradient(
+                circle at 50% 50%, 
+                rgba(212, 175, 55, 0.25) 0%, 
+                rgba(30, 25, 15, 0.8) 35%, 
+                #000000 70% 
+            );
+        }
+
+        /* =========================================
+           오프닝 봉투 애니메이션 CSS 
+           ========================================= */
+        .envelope-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #000000;
+            background-image: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.25) 0%, rgba(30, 25, 15, 0.8) 35%, #000000 70%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* 봉투 애니메이션이 끝나면 오버레이 전체가 사라짐 */
+            animation: fadeOutOverlay 1s 3.5s forwards;
+            pointer-events: none; /* 클릭 방해 방지 */
+        }
+
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #111;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.1), 0 30px 60px rgba(0,0,0,0.9);
+        }
+
+        /* 봉투 아랫부분 (앞면) */
+        .envelope-front {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 150px solid #1a1a1a;
+            border-right: 150px solid #1a1a1a;
+            border-bottom: 120px solid #222;
+            z-index: 3;
+        }
+
+        /* 봉투 덮개 (위에서 열리는 부분) */
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 120px solid #2a2a2a;
+            transform-origin: top;
+            z-index: 4;
+            animation: openFlap 1s 1s forwards;
+        }
+
+        /* 골드 왁스 실링 (가운데 W 마크) */
+        .wax-seal {
+            position: absolute;
+            top: 120px; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 45px; height: 45px;
+            background: radial-gradient(circle, #D4AF37 0%, #AA8C2C 100%);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #4a3810;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            font-weight: 600;
+            /* 덮개가 열리기 직전에 부서지듯 사라짐 */
+            animation: breakSeal 0.5s 0.8s forwards;
+        }
+
+        /* 봉투 안에서 살짝 튀어나오는 작은 종이 */
+        .envelope-paper {
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            background: var(--card-black);
+            border: 1px solid var(--muted-gold);
+            z-index: 2;
+            animation: slideUpPaper 1.5s 1.5s forwards;
+        }
+
+        /* 봉투 애니메이션 키프레임 */
+        @keyframes breakSeal {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); visibility: hidden; }
+        }
+        @keyframes openFlap {
+            0% { transform: rotateX(0deg); }
+            100% { transform: rotateX(180deg); z-index: 1; }
+        }
+        @keyframes slideUpPaper {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+        @keyframes fadeOutOverlay {
+            0% { opacity: 1; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+
+        /* =========================================
+           메인 초대장 카드 CSS 
+           ========================================= */
+        .invitation-card {
+            background-color: var(--card-black);
+            width: 100%;
+            max-width: 450px;
+            padding: 50px 30px;
+            border-radius: 2px;
+            box-shadow: 0 0 80px rgba(212, 175, 55, 0.15), 0 30px 60px rgba(0, 0, 0, 0.9); 
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            border: 1px solid var(--muted-gold);
+            outline: 1px solid var(--muted-gold);
+            outline-offset: -8px;
+            
+            /* 봉투 애니메이션(약 3초)이 끝난 후 초대장 등장 */
+            opacity: 0;
+            animation: slideUpFade 1.2s 3.2s ease-out forwards;
+        }
+
+        /* 텍스트 요소별 순차적 애니메이션 딜레이 (봉투 시간 + 기존 딜레이) */
+        .delay-1 { animation-delay: 3.6s; }
+        .delay-2 { animation-delay: 4.0s; }
+        .delay-3 { animation-delay: 4.4s; }
+
+        .fade-in-element {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        /* 텍스트 스타일링 */
+        .header-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--light-gold);
+            margin: 0 0 10px 0;
+            line-height: 1.2;
+        }
+
+        .ornament {
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin: 20px 0;
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+
+        .menu-section {
+            margin: 40px 0;
+            padding: 30px 0;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .menu-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            letter-spacing: 0.2em;
+            margin-bottom: 30px;
+        }
+
+        .course {
+            margin-bottom: 28px;
+        }
+
+        .course:last-child {
+            margin-bottom: 0;
+        }
+
+        .course-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            color: var(--muted-gold);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .dish-name {
+            font-size: 1.15rem;
+            color: #ffffff;
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
+        }
+
+        .dish-description {
+            font-size: 0.8rem;
+            color: var(--text-dark-gray);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+            padding: 0 10px;
+            word-break: keep-all;
+        }
+
+        .details-box {
+            margin-top: 40px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .detail-item {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-item.highlight {
+            color: var(--light-gold);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .detail-separator {
+            color: var(--muted-gold);
+            font-size: 0.8rem;
+            margin: 12px 0;
+        }
+
+        /* 카드 및 텍스트 등장 키프레임 */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="envelope-overlay">
+        <div class="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-paper"></div>
+            <div class="envelope-front"></div>
+            <div class="wax-seal">W</div> 
+        </div>
+    </div>
+
+    <div class="invitation-card">
+        
+        <div class="fade-in-element delay-1">
+            <div class="header-text">Join us for a</div>
+            <h1 class="title">Special Dinner</h1>
+            <div class="ornament">✧ ✦ ✧</div>
+        </div>
+
+        <div class="menu-section fade-in-element delay-2">
+            <div class="menu-title">MENU</div>
+
+            <div class="course">
+                <div class="course-name">Aperitivo</div>
+                <div class="dish-name">광양 매실청을 넣은 스파클링 워터</div>
+                <div class="dish-description">광양에서 충분한 햇빛을 받고 자란 매실을 직접 공수하여 수작업으로 만든 상큼하고 청량한 맛이 일품인 매실청을 넣은 음료</div>
+            </div>
+
+            <div class="course">
+                <div class="course-name">Antipasto</div>
+                <div class="dish-name">유기농 양상추와 토마토, 블루베리 그리고 견과류를 곁들인 그린 샐러드 with 발사믹 드레싱</div>
+                <div class="dish-description">청정수로 키운 양상추와 태양같은 빨간 토마토, 블루베리를 넣은 샐러드에 분쇄 견과류를 넣어 발사믹 드레싱으로 맛을 낸 샐러드</div>
+            </div>
+            
+            <div class="course">
+                <div class="course-name">Primo Piatto</div>
+                <div class="dish-name">참나물 오일 파스타</div>
+                <div class="dish-description">봄의 따사로운 햇살을 받고 자란 제철 참나물과 100% 엑스트라 버진 올리브오일로 조리한 오일 파스타</div>
+            </div>
+            
+            <div class="course">
+                <div class="course-name">Second Piatto</div>
+                <div class="dish-name">한우 안심 스테이크</div>
+                <div class="dish-description">클래식을 들으며 유기농 건초만 먹고 자란 1++ 등급 한우 암소를 적절한 굽기로 익혀내어 낸 고기요리</div>
+            </div>
+
+            <div class="course">
+                <div class="course-name">Dolce</div>
+                <div class="dish-name">열대과일 아이스 젤리</div>
+                <div class="dish-description">동남아의 청량한 과즙을 머금은 아이스 젤리</div>
+            </div>
+
+            <div class="course">
+                <div class="course-name">Caffè</div>
+                <div class="dish-name">에스프레소/두유 카페라떼</div>
+                <div class="dish-description">특별한 블렌드의 원두를 사용한 에스프레소를 사용한 커피음료</div>
+            </div>
+        </div>
+
+        <div class="details-box fade-in-element delay-3">
+            <div class="detail-item highlight">Wednesday, March 18, 2026</div>
+            <div class="detail-item">7:30 PM</div>
+            <div class="detail-separator">✦</div>
+            <div class="detail-item highlight">The Grand Lounge 'WS house'</div>
+            <div class="detail-item"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
